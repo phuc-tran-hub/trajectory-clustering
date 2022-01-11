@@ -8,12 +8,9 @@ import numpy as np
 
 '''calculate the distance between two line segments.'''
 def distance(line1, line2):
-    # the distance threshold to determine similar line segments
-    epsilon = 10
-
     # the weight of each lines
     wPerpendicular = 0
-    wLateral = 0
+    wLateral = 1
     wAngle = 1
 
     print(line1)
@@ -51,4 +48,29 @@ def perpendiculardistance(line1, line2):
 
 
 def lateraldistance(line1, line2):
-    return 10
+    # extracting the x coordinates of the two line segments
+    line1XCoords = [line1[1][0], line1[0][0]]
+    line2XCoords = [line2[1][0], line2[0][0]]
+
+    # sorting the x coordinates to ascending order
+    line1XCoords.sort()
+    line2XCoords.sort()
+
+    # first case: line 2 is within boundaries of line 1
+    if line2XCoords[0] in range(line1XCoords[0], line1XCoords[1]) and line2XCoords[1] in range(line1XCoords[0], line1XCoords[1]):
+
+        # calculate the minimum distance between line 1 and line 2
+        latDist = min(line2XCoords[0] - line1XCoords[0], line1XCoords[1] - line2XCoords[1])
+        return latDist
+
+    # second case: line 1 is within boundaries of line 2
+    elif line1XCoords[0] in range(line2XCoords[0], line2XCoords[1]) and line1XCoords[1] in range(line2XCoords[0], line2XCoords[1]):
+        
+        # calculate the minimum distance between line 1 and line 2
+        latDist = min(line1XCoords[0] - line2XCoords[0], line2XCoords[1] - line1XCoords[1])
+        return latDist
+
+    # third case: if both lines are not in boundaries of each other, return a default distance
+    else:
+        latDist = 10
+        return latDist 
