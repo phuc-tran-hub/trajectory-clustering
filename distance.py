@@ -58,14 +58,16 @@ def perpendiculardistance(line1, line2):
         # calculate the perpendicular distance between line 1 and line 2
         yStartDiff = line2YCoords[0] - line1YCoords[0]
         yEndDiff = line2YCoords[1] - line1YCoords[1]
-        perDist = (math.pow(yStartDiff, 2) + math.pow(yEndDiff, 2)) / (yStartDiff + yEndDiff)
+        perDist = abs((math.pow(yStartDiff, 2) + math.pow(yEndDiff, 2)) / (yStartDiff + yEndDiff))
         return perDist
 
     # second case: line 1 is within boundaries of line 2
     elif line1YCoords[0] in range(line2YCoords[0], line2YCoords[1]) and line1YCoords[1] in range(line2YCoords[0], line2YCoords[1]):
         
-        # calculate the minimum distance between line 1 and line 2
-        perDist = min(line1YCoords[0] - line2YCoords[0], line2YCoords[1] - line1YCoords[1])
+        # calculate the perpendicular distance between line 1 and line 2
+        yStartDiff = line1YCoords[0] - line2YCoords[0]
+        yEndDiff = line1YCoords[1] - line2YCoords[1]
+        perDist = abs((math.pow(yStartDiff, 2) + math.pow(yEndDiff, 2)) / (yStartDiff + yEndDiff))
         return perDist
 
     # third case: if both lines are not in boundaries of each other, return a default distance
