@@ -5,6 +5,7 @@
 
 # Libraries
 import numpy as np
+import math
 
 '''calculate the distance between two line segments.'''
 def distance(line1, line2):
@@ -43,9 +44,34 @@ def angle(line1, line2):
 
 
 def perpendiculardistance(line1, line2):
-    # TODO: find the perpendicular distance
-    return 10
+    # extracting the y coordinates of the two line segments
+    line1YCoords = [line1[1][1], line1[0][1]]
+    line2YCoords = [line2[1][1], line2[0][1]]
 
+    # sorting the x coordinates to ascending order
+    line1YCoords.sort()
+    line2YCoords.sort()
+
+    # first case: line 2 is within boundaries of line 1
+    if line2YCoords[0] in range(line1YCoords[0], line1YCoords[1]) and line2YCoords[1] in range(line1YCoords[0], line1YCoords[1]):
+
+        # calculate the perpendicular distance between line 1 and line 2
+        yStartDiff = line2YCoords[0] - line1YCoords[0]
+        yEndDiff = line2YCoords[1] - line1YCoords[1]
+        perDist = (math.pow(yStartDiff, 2) + math.pow(yEndDiff, 2)) / (yStartDiff + yEndDiff)
+        return perDist
+
+    # second case: line 1 is within boundaries of line 2
+    elif line1YCoords[0] in range(line2YCoords[0], line2YCoords[1]) and line1YCoords[1] in range(line2YCoords[0], line2YCoords[1]):
+        
+        # calculate the minimum distance between line 1 and line 2
+        perDist = min(line1YCoords[0] - line2YCoords[0], line2YCoords[1] - line1YCoords[1])
+        return perDist
+
+    # third case: if both lines are not in boundaries of each other, return a default distance
+    else:
+        perDist = 10
+        return perDist 
 
 def lateraldistance(line1, line2):
     # extracting the x coordinates of the two line segments
