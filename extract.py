@@ -22,7 +22,7 @@ lineID = 1
 # making the most recent line coordinates out of every ships
 # generated ten line segments
 for shipObject in shipObjectList:
-    if len(shipObject.positionList) > 3:
+    if len(shipObject.positionList) > 2:
         secondLatestPosition = shipObject.positionList[len(shipObject.positionList) - 2]
         LatestPosition = shipObject.positionList[len(shipObject.positionList) - 1]
 
@@ -35,12 +35,11 @@ for shipObject in shipObjectList:
         newLine.append([xCoords[0], yCoords[0]])
         newLine.append([xCoords[1], yCoords[1]])
 
-        newSeg = Line(lineID, newLine)
+        newSeg = Line(shipObject.shipName, lineID, newLine)
         lineID = lineID + 1 
         coordsObjList.append(newSeg)
-        print(coordsObjList)
 
-
+print(coordsObjList)
 # setting parameters:
 # DL is the list of line segments 
 # eps is the threshold distance for line segments
@@ -51,7 +50,7 @@ minLns = 1
 newDL = opticsclustering(DL, eps, minLns)
 
 for line in newDL:
-    print("line's ID: " + str(line.lineID) + "\t line's clusterID: " + str(line.clusterID) + "\t \t line's lineSeg: " + str(line.lineSeg))
+    print("shipName: " + str(line.shipName) + "\t line's ID: " + str(line.lineID) + "\t line's clusterID: " + str(line.clusterID) + "\t \t line's lineSeg: " + str(line.lineSeg))
     xCoords = [line.lineSeg[0][0], line.lineSeg[1][0]]
     yCoords = [line.lineSeg[0][1], line.lineSeg[1][1]]
     # displaying the line segment
