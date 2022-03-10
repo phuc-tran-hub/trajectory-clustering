@@ -1,57 +1,63 @@
 # Name: Phuc Tran
 # Date: January 17th, 2022
 # Title: preprocess.c
-# Description: pulling out data from a AIS csv file to store into line segments
+# Description: preprocess an AIS file to fit into a list of ship objects
 
 import pandas
 import csv
 import numpy
 from ship import Ship
 
-# Storing the ship names onto a list
-# Only testing 200 rows for now
-col_list = ["Timestamp", "Type of mobile" , "MMSI" , "Latitude" , "Longitude" , "Navigational status" , "ROT" , "SOG" , "COG" , "Heading" , "IMO" , "Callsign" ,
-        "Name" , "Ship type" , "Cargo type" , "Width" , "Length" , "Type of position fixing device" , "Draught" , "Destination" , "ETA" , "Data source type"]
-AIS_csv_data = pandas.read_csv('AIS.csv', nrows=200, usecols=col_list)
-shipNameList = list(AIS_csv_data["Name"])
-# the first line is identifying the column name
+def preprocess(fileName, nRows):
+	# Storing the ship names onto a list
+	# Only testing 200 rows for now
+	AIS_csv_data = pandas.read_csv(fileName, nrows=nRows)
+	shipNameList = list(AIS_csv_data["Name"])
+	# the first line is identifying the column name
 
-# Storing it into a numpy array for convenience sake
-shipNameList = numpy.unique(numpy.copy(shipNameList))
+	# Storing it into a numpy array for convenience sake
+	shipNameList = numpy.unique(numpy.copy(shipNameList))
 
-shipNameFile = open("shipName.txt", "w")
-for shipName in shipNameList:
-        if str(shipName) != "nan":  
-                shipNameFile.write(str(shipName) + "\n")
+	# Start the pandas dataframe for the csv file
+	shipObjectList = []
+	shipOccurenceList = []
+	AIS_csv_data_df = pandas.DataFrame(AIS_csv_data)
+	# Iterate through the first n-rows:
+	for idx, row in AIS_csv_data_df.iterrows():
+		if str(row["Name"]) == "nan":
+			continue
 
-shipNameFile.close()
+		if str(row["Name"]) in shipNameList:
+			if str(row["Name"]) not in shipOccurenceList:
+				newShip = Ship(str(row["Name"]))			
+				shipObjectList.append(newShip)
+				shipOccurenceList.append(str(row["Name"]))
+			
+			# Inefficient right now, but being used for purely testing prototype
+			newLocation = [str(row["Timestamp"]), round(float(row["Latitude"]), 2), round(float(row["Longitude"]), 2)]
+			for shipObject in shipObjectList:
+				if str(row["Name"]) == shipObject.shipName:
+					if len(shipObject.positionList) > 0:
 
-shipObjectList = []
-AIS_csv_data_df = pandas.DataFrame(AIS_csv_data)
-# Iterate through the first n-rows:
-for idx, row in AIS_csv_data_df.iterrows():
-        if str(row["Name"]) == "nan":
-                continue
+						latestLocation = shipObject.positionList[len(shipObject.positionList) - 1]
+						# If the ship is at the same location, ignore that position
+						if latestLocation[1] == newLocation[1] and latestLocation[2] == newLocation[2]:
+							continue
 
-        if str(row["Name"]) in shipNameList:
-                if str(row["Name"]) not in shipObjectList:
-                        newShip = Ship(str(row["Name"]))
-                        shipObjectList.append(newShip)
-                
-                # Inefficient right now, but being used for purely testing prototype
-                newLocation = [str(row["Timestamp"]), str(row["Latitude"]), str(row["Longitude"])]
-                for shipObject in shipObjectList:
-                        if str(row["Name"]) == shipObject.shipName:
-                                shipObject.addNewPosition(newLocation)
-                                print("{} shipName {} position list {} \n".format(idx, shipObject.shipName, shipObject.positionList))
+					# Update the ship's position
+					shipObject.addNewPosition(newLocation)
+					# print("{} shipName {} position list {} \n".format(idx, shipObject.shipName, shipObject.positionList))
 
-# Iterate through the ship object list
-shipObjectFile = open("shipObjectAndLocation.txt", "w")
-for shipObject in shipObjectList:
-        shipObjectFile.write(shipObject.shipName + "\n")
-        shipObjectFile.write(str(shipObject.positionList) + "\n")
+	# Iterate through the ship object list
+	# Printing out the ship's name and its past locations
+	shipObjectFile = open("shipObjectAndLocation.txt", "w")
+	for shipObject in shipObjectList:
+		shipObjectFile.write(shipObject.shipName + "\n")
+		shipObjectFile.write(str(shipObject.positionList) + "\n")
 
-shipObjectFile.close()
+	shipObjectFile.close()
+
+	return shipObjectList
 
 
 
