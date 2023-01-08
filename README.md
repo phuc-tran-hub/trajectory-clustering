@@ -1,6 +1,4 @@
-# Phuc Tran
-
-## Ongoing
+## September 2021
 
 ### Trajectory-Clustering Research
 
